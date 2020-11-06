@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Echo</title>
+</head>
+<body>
+<section id="chatbox">
+    <div>
+        <label for="msg">Message</label>
+        <input type="text" id="msg" />
+        <button id="sendBtn">Send message</button>
+    </div>
+    <div>
+        <ol id="chat"></ol>
+    </div>
+</section>
+</body>
+<script type="application/javascript">
+    const submitWinnerButton = document.getElementById("sendBtn");
+    const winnerInput = document.getElementById("msg");
+    const chat = document.getElementById("chat");
+
+    if (window["WebSocket"]) {
+        const conn = new WebSocket("ws://localhost:8000");
+
+        submitWinnerButton.onclick = (event) => {
+            conn.send(winnerInput.value);
+        };
+
+        conn.onopen = (ev) => {
+            const msg = document.createElement("li");
+            msg.innerHTML = "Welcome to Echo server!";
+            chat.appendChild(msg);
+        }
+
+        conn.onmessage = (ev) => {
+            const msg = document.createElement("li");
+            msg.innerHTML = ev.data;
+            chat.appendChild(msg);
+        }
+
+        conn.onclose = (ev) => {
+            const msg = document.createElement("li");
+            msg.innerHTML = "Closed connection.";
+            chat.appendChild(msg);
+        }
+
+        conn.onerror = (ev) => {
+            const err = document.createElement("li");
+            err.innerHTML = "Could not connect to websocket server...";
+            chat.appendChild(err);
+        }
+    }
+</script>
+</html>
